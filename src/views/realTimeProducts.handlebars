@@ -1,0 +1,38 @@
+<div id="contenedorProductos"></div>
+
+<h2> Formulario para agregar producto</h2>
+
+<form id="formulario" method="POST">
+  <div>
+    <label for="title">Nombre:</label>
+    <input type="text" id="title" name="title" required />
+  </div>
+  <br />
+  <div>
+    <label for="description">Descripción:</label>
+    <input type="text" id="description" name="description" required />
+  </div>
+  <br />
+  <div>
+    <label for="code">Código:</label>
+    <input type="text" id="code" name="code" required />
+  </div>
+  <br />
+  <div>
+    <label for="price">Precio:</label>
+    <input type="number" id="price" name="price" required />
+  </div>
+  <br />
+  <div>
+    <label for="stock">Stock:</label>
+    <input type="number" id="stock" name="stock" required />
+  </div>
+  <br />
+  <div>
+    <button type="submit">Agregar Producto</button>
+  </div>
+</form>
+<br />
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/script.js"></script>
