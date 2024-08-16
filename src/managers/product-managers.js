@@ -8,13 +8,17 @@ class productManager {
   constructor(path) {
     this.products = [];
     this.path = path;
+    this.inicializarId(); // Inicializar ID
   }
 
-  async addProduct({ title, description, price, code, stock, status }) {
-    if (!title || !description || !price || !code || !stock || !status ) {
+  async addProduct({ title, description, price, code, stock }) {
+    if (!title || !description || !price || !code || !stock) {
       console.log("todos los campos son obligatorios");
       return;
     }
+
+    // Cargar los productos actuales desde el archivo antes de agregar uno nuevo
+    this.products = await this.getProducts();
 
     if (this.products.some((item) => item.code === code)) {
       console.log("el codigo debe ser unico");
@@ -26,22 +30,24 @@ class productManager {
       title,
       description,
       price,
-      img,
       code,
       stock,
     };
 
     this.products.push(nuevoProducto);
-
     await this.guardarArchivo(this.products);
+
+    console.log("Producto agregado:", nuevoProducto);
   }
 
   async getProducts() {
     try {
       const arrayProductos = await this.leerArchivo();
+      this.products = arrayProductos; // Sincronizar productos en memoria
       return arrayProductos;
     } catch (error) {
       console.log("error al leer el archivo", error);
+      return []; // Devolver una lista vacía en caso de error
     }
   }
 
@@ -59,6 +65,13 @@ class productManager {
       }
     } catch (error) {
       console.log("error al buscar por id", error);
+    }
+  }
+
+  async inicializarId() {
+    const productos = await this.getProducts();
+    if (productos.length > 0) {
+      productManager.ultId = Math.max(...productos.map((prod) => prod.id));
     }
   }
 

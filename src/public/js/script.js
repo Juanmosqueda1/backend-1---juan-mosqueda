@@ -1,6 +1,8 @@
 const socket = io();
 
+// Escuchar el evento "productos" y llamar a renderProductos
 socket.on("productos", (data) => {
+  console.log("Productos recibidos:", data); // Depuración
   renderProductos(data);
 });
 
@@ -10,22 +12,28 @@ const renderProductos = (productos) => {
 
   productos.forEach((item) => {
     const card = document.createElement("div");
-    card.innerHTML = `  <p> ${item.title} </p>
-                            <p> ${item.description} </p>
-                            <p> $${item.price} </p>
-                            <button> Eliminar </button>`;
+    card.innerHTML = `
+      <p> ${item.title} </p>
+      <p> ${item.description} </p>
+      <p> $${item.price} </p>
+      <button> Eliminar </button>`;
+
     contenedorProductos.appendChild(card);
 
+    // Agregar evento de eliminación de producto
     card.querySelector("button").addEventListener("click", () => {
       eliminarProducto(item.id);
     });
   });
 };
 
+// Emitir el evento para eliminar un producto
 const eliminarProducto = (id) => {
+  console.log("Eliminar producto con id:", id); // Depuración
   socket.emit("eliminarProducto", id);
 };
 
+// Manejar el envío del formulario
 const formulario = document.getElementById("formulario");
 
 formulario.addEventListener("submit", (e) => {
@@ -45,13 +53,17 @@ formulario.addEventListener("submit", (e) => {
       price,
       stock,
     });
-    console.log("Enviado al socket");
 
-    document.getElementById("title").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("code").value = "";
-    document.getElementById("price").value = "";
-    document.getElementById("stock").value = "";
+    console.log("Datos enviados:", {
+      title,
+      description,
+      code,
+      price,
+      stock,
+    });
+
+    // Resetea el formulario
+    formulario.reset();
   } else {
     console.log("Todos los campos son obligatorios.");
   }

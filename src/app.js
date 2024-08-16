@@ -11,6 +11,7 @@ const socket = require("socket.io");
 //middleware
 app.use(express.json());
 app.use(express.static("./src/public"));
+app.use(express.urlencoded({extended: true}))
 
 //configuro handlebars
 app.engine("handlebars", exphbs.engine());
@@ -50,8 +51,11 @@ io.on("connection", async (socket) => {
 
   // Manejar adición de productos desde el formulario
   socket.on("productForm", async (data) => {
+    console.log("Datos recibidos del cliente:", data);
     try {
-      const { title, description, price, code, stock, category, status = true} = data;
+      const { title, description, price, code, stock, category } = data;
+
+      // Asegúrate de que el producto se añade correctamente
       await manager.addProduct({
         title,
         description,
@@ -60,10 +64,31 @@ io.on("connection", async (socket) => {
         stock,
         category,
       });
-      io.emit("productos", await manager.getProducts());
-      console.log("Producto añadido y productos actualizados");
+
+      // Emitir la lista actualizada de productos
+      const updatedProducts = await manager.getProducts();
+      io.emit("productos", updatedProducts);
+
+      console.log(
+        "Producto añadido y lista de productos actualizada:",
+        updatedProducts
+      );
     } catch (error) {
       console.error("Error al añadir el producto:", error);
     }
   });
 });
+
+// (async () => {
+//   await manager.addProduct({
+//     title: "Producto de Prueba",
+//     description: "Descripción de Prueba",
+//     price: 100,
+//     code: "PRUEBA123",
+//     stock: 50,
+//     status: true,
+//   });
+
+//   console.log(await manager.getProducts());
+// })();
+
