@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const productManager = require("../managers/product-managers.js");
-const e = require("express");
-const manager = new productManager("./src/data/productos.json");
+const productManager = require("../dao/db/product-manager-db.js");
+const manager = new productManager();
 
 //listar los productos
 

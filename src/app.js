@@ -7,11 +7,12 @@ const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
 const { Server } = require("socket.io");
 const socket = require("socket.io");
+require("./database.js");
 
 //middleware
 app.use(express.json());
 app.use(express.static("./src/public"));
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }));
 
 //configuro handlebars
 app.engine("handlebars", exphbs.engine());
@@ -29,8 +30,8 @@ const httpServer = app.listen(PUERTO, () => {
 
 const io = socket(httpServer);
 
-const ProductManager = require("./managers/product-managers.js");
-const manager = new ProductManager("./src/data/productos.json");
+const ProductManager = require("./dao/db/product-manager-db.js")
+const manager = new ProductManager();
 
 io.on("connection", async (socket) => {
   console.log("Un cliente se conectó");
@@ -78,17 +79,3 @@ io.on("connection", async (socket) => {
     }
   });
 });
-
-// (async () => {
-//   await manager.addProduct({
-//     title: "Producto de Prueba",
-//     description: "Descripción de Prueba",
-//     price: 100,
-//     code: "PRUEBA123",
-//     stock: 50,
-//     status: true,
-//   });
-
-//   console.log(await manager.getProducts());
-// })();
-
