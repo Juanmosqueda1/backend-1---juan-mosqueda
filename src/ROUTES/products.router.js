@@ -6,8 +6,23 @@ const manager = new productManager();
 //listar los productos
 
 router.get("/", async (req, res) => {
-  const arrayProductos = await manager.getProducts();
-  res.send(arrayProductos);
+  let sort = req.query.sort || "asc";  // Obtener el parámetro de orden (ascendente o descendente)
+  let sortOption = sort === "desc" ? -1 : 1;  // Definir la opción de orden para Mongoose
+
+  try {
+    // Obtener productos ordenados por precio según la opción de orden
+    const arrayProductos = await manager.getProducts({});  // Obtener productos sin filtro
+
+    const productosOrdenados = arrayProductos.sort((a, b) => {
+      if (sortOption === 1) return a.price - b.price;  // Orden ascendente
+      return b.price - a.price;  // Orden descendente
+    });
+
+    res.json(productosOrdenados);  // Enviar la respuesta en formato JSON con los productos ordenados
+  } catch (error) {
+    console.error("Error al obtener los productos:", error);
+    res.status(500).send("Error al obtener los productos");
+  }
 });
 
 //buscar producto por id

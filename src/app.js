@@ -7,6 +7,8 @@ const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
 const { Server } = require("socket.io");
 const socket = require("socket.io");
+const mongoose = require("mongoose");
+const ProductosModel = require("./dao/models/productos.models.js");
 require("./database.js");
 
 //middleware
@@ -15,7 +17,15 @@ app.use(express.static("./src/public"));
 app.use(express.urlencoded({ extended: true }));
 
 //configuro handlebars
-app.engine("handlebars", exphbs.engine());
+app.engine(
+  "handlebars",
+  exphbs.engine({
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true, // Permite acceso a propiedades heredadas
+      allowProtoMethodsByDefault: true, // Permite acceso a métodos heredados
+    },
+  })
+);
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
@@ -30,7 +40,7 @@ const httpServer = app.listen(PUERTO, () => {
 
 const io = socket(httpServer);
 
-const ProductManager = require("./dao/db/product-manager-db.js")
+const ProductManager = require("./dao/db/product-manager-db.js");
 const manager = new ProductManager();
 
 io.on("connection", async (socket) => {

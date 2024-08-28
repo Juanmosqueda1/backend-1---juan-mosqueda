@@ -1,12 +1,23 @@
 <h1>mis productos</h1>
 
-<div class="contenedorProductos">
-  {{#each productos}}
-    <div class="card">
-      <p> {{this.title}} </p>
-      <p> {{this.description}} </p>
-      <p> {{this.price}} </p>
-      <button>comprar</button>
-    </div>
-  {{/each}}
-</div>
+<!-- Enlaces para ordenar los productos -->
+<a href="/products?page={{currentPage}}&sort=asc">Ordenar por precio ascendente</a>
+<a href="/products?page={{currentPage}}&sort=desc">Ordenar por precio descendente</a>
+
+{{#each products}}
+  <div class="card">
+    <p> {{this.title}} </p>
+    <p> {{this.description}} </p>
+    <p> {{this.price}} </p>
+    <button>agregar al carrito</button>
+  </div>
+{{/each}}
+{{#if hasPrevPage}}
+  <a href="/products?page={{prevPage}}"> Anterior</a>
+{{/if}}
+
+{{#if hasNextPage}}
+  <a href="/products?page={{nextPage}}"> siguiente</a>
+{{/if}}
+
+<p>{{currentPage}} de {{totalPages}}</p>

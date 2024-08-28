@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const mongoosePaginate = require("mongoose-paginate-v2")
 
 //definimos es schema
 const productoSchema = new mongoose.Schema({
@@ -35,6 +36,8 @@ const productoSchema = new mongoose.Schema({
         type: [String]
     }
 })
+
+productoSchema.plugin(mongoosePaginate)
 
 //middleware
 
