@@ -3,13 +3,20 @@ const exphbs = require("express-handlebars");
 const app = express();
 const PUERTO = 8080;
 const productsRouter = require("./routes/products.router.js");
+const sessionRouter = require("./routes/session.router.js");
 const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
 const { Server } = require("socket.io");
 const socket = require("socket.io");
 const mongoose = require("mongoose");
 const ProductosModel = require("./dao/models/productos.models.js");
+const cookieParser = require("cookie-parser");
 require("./database.js");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const passport = require("passport")
+const initializePassport = require("./config/passport.config.js")
+
 
 //middleware
 app.use(express.json());
@@ -29,14 +36,36 @@ app.engine(
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
-//rutas
-app.use("/api/products/", productsRouter);
-app.use("/api/carts", cartsRouter);
-app.use("/", viewsRouter);
-
 const httpServer = app.listen(PUERTO, () => {
   console.log(`Escuchando en el http://localhost:${PUERTO}`);
 });
+
+const claveSecreta = "holamundo";
+app.use(cookieParser(claveSecreta));
+
+//session
+app.use(
+  session({
+    secret: "secretcoder",
+    resave: true,
+    //resave me permite mantener  activa la sesion frente a la inacticidad del usuario
+    saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl:
+        "mongodb+srv://juan-mosqueda:coderjuan@cluster0.yzyo4.mongodb.net/storage?retryWrites=true&w=majority&appName=Cluster0",
+      ttl: 100,
+    }),
+  }));
+
+  initializePassport()
+  app.use(passport.initialize())
+  app.use(passport.session())
+
+//rutas
+app.use("/api/products/", productsRouter);
+app.use("/api/carts", cartsRouter);
+app.use("/api/sessions", sessionRouter);
+app.use("/", viewsRouter);
 
 const io = socket(httpServer);
 

@@ -5,20 +5,3 @@ mongoose.connect(
   )
   .then(() => console.log("conexion exitosa"))
   .catch((error) => console.log("tenemos un error", error));
-
-// const resultado = await ProductosModel.aggregate([
-//   {
-//     $match: {
-//       title: "The Witcher 3: Wild Hunt",
-//     },
-//   },
-//   {
-//     $group: {
-//       _id: "$category",
-//       total: {
-//         $sum: "stock",
-//       },
-//     },
-//   },
-// ]);
-// console.log(resultado);

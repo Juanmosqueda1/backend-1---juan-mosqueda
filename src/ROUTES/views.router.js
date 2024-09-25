@@ -4,6 +4,27 @@ const ProductManager = require("../dao/db/product-manager-db.js");
 const manager = new ProductManager();
 const ProductosModel = require("../dao/models/productos.models.js");
 
+router.get("/login", (req, res) => {
+  if (req.session.login) {
+    return res.redirect("/profile");
+  }
+  res.render("login");
+});
+
+router.get("/register", (req, res) => {
+  if (req.session.login) {
+    return res.redirect("/profile");
+  }
+  res.render("register");
+});
+
+router.get("/profile", (req, res) => {
+  if (!req.session.login) {
+    return res.redirect("/login");
+  }
+  res.render("profile", { user: req.session.user });
+});
+
 router.get("/products", async (req, res) => {
   let page = req.query.page || 1;
   let limit = 4;
