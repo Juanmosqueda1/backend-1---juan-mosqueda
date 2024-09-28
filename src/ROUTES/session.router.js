@@ -4,16 +4,17 @@ const UserModel = require("../dao/models/user.model.js");
 const { createHash, isValidPassword } = require("../utils/utils.js");
 const passport = require("passport");
 const generateToken = require("../utils/jsonwebtoken.js");
+const jwt = require("jsonwebtoken");
 
 //register jws
 
 router.post("/register", async (req, res) => {
-  const { first_name, last_name, email, password, age } = req.body;
+  const { first_name, last_name, email, password, age, rol } = req.body;
 
   try {
     const existeUsuario = await UserModel.findOne({ email });
     if (existeUsuario) {
-      return res.send("el usuario ya esta registrado");
+      return res.status(400).send("el usuario ya esta registrado");
     }
     //si no existe creamos uno nuevo
     const nuevoUsuario = await UserModel.create({
@@ -22,7 +23,10 @@ router.post("/register", async (req, res) => {
       email,
       password: createHash(password),
       age,
+      rol
     });
+
+    await nuevoUsuario.save();
 
     //generamos el token
     const token = generateToken({
@@ -31,92 +35,66 @@ router.post("/register", async (req, res) => {
       email: nuevoUsuario.email,
     });
 
-    res.status(201).send({ message: "usuario creado", token });
+    res.cookie("cookieToken", token, {
+      maxAge: 3600000,
+      httpOnly: true,
+    });
+
+    res.redirect("/products");
   } catch (error) {
     console.error(error);
     res.status(500).send("error fatal");
   }
 });
 
-//register version passport
-// router.post(
-//   "/register",
-//   passport.authenticate("register", {
-//     failureRedirect: "/api/sessions/failregister",
-//   }),
-//   async (req, res) => {
-//     if (!req.user) return res.send("credenciales invalidas");
-
-//     req.session.user = {
-//       first_name: req.user.first_name,
-//       last_name: req.user.last_name,
-//       age: req.user.age,
-//       email: req.user.email,
-//     };
-
-//     req.session.login = true;
-
-//     res.redirect("/profile");
-//   }
-// );
-
-// router.get("/failregister", (req, res) => {
-//   res.send("fallo el registro");
-// });
-
-
 //login con jwt
-router.post("/login", async (req,res) => {
-   const {email, password} = req.body
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-   try {
-    const usuario = await UserModel.findOne({email})
+  try {
+    // Normalizar el email
+    const emailLimpio = email.trim().toLowerCase();
+    const usuario = await UserModel.findOne({ email: emailLimpio });
 
-    if(!usuario){
-      res.send("usuario no encontrado")
+    if (!usuario) {
+      return res.send("usuario no encontrado");
     }
-    if(!isValidPassword(password, usuario)){
-      return res.send("credenciales invalidas")
+
+    // Verificar la contraseña
+    if (!isValidPassword(password, usuario)) {
+      return res.send("credenciales invalidas");
     }
 
+    // Generar el token JWT
     const token = generateToken({
       first_name: usuario.first_name,
       last_name: usuario.last_name,
       email: usuario.email,
+    });
+
+    req.session.user = {
+      first_name: usuario.first_name,
+      last_name: usuario.last_name,
+      email: usuario.email,
       age: usuario.age
-    })
+    }
 
-    res.send({message:"logueado con exito", token})
-   } catch (error) {
-    res.status(500).send(error)
-   }
-})
+    req.session.login = true
 
-//login version para passport
-// router.post(
-//   "/login",
-//   passport.authenticate("login", {
-//     failureRedirect: "/api/sessions/faillogin",
-//   }),
-//   async (req, res) => {
-//     if (!req.user) return res.send("credenciales invalidas");
+    // Configurar la cookie con el token
+    res.cookie("cookieToken", token, {
+      maxAge: 3600000, // 1 hora
+      httpOnly: true,
+    });
 
-//     req.session.user = {
-//       first_name: req.user.first_name,
-//       last_name: req.user.last_name,
-//       age: req.user.age,
-//       email: req.user.email,
-//     };
+    // Redirigir al usuario a /products
+    return res.redirect("/products");
 
-//     req.session.login = true;
-
-//     res.redirect("/profile");
-//   }
-// );
-
-// router.get("/faillogin", (req, res) => {
-//   res.send("fallo el login");
-// });
+  } catch (error) {
+    // Manejo de errores
+    return res.status(500).send(error);
+  }
+});
 
 router.get("/logout", (req, res) => {
   if (req.session.login) {

@@ -1,4 +1,8 @@
-<h1>mis productos</h1>
+<h1>Mi Perfil</h1>
+
+<p>Bienvenido! {{user.first_name}} {{user.last_name}} </p>
+<p>email : {{user.email}}</p>
+<p>edad: {{ user.age }}</p>
 
 <!-- Enlaces para ordenar los productos -->
 <a href="/products?page={{currentPage}}&sort=asc">Ordenar por precio ascendente</a>
@@ -20,4 +24,5 @@
   <a href="/products?page={{nextPage}}"> siguiente</a>
 {{/if}}
 
-<p>{{currentPage}} de {{totalPages}}</p>
+<p>{{currentPage}} de {{totalPages}}</p> <a href="api/sessions/logout"> Logout </a>
+

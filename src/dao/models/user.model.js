@@ -23,6 +23,11 @@ const userSchema = new moongoose.Schema({
     type: Number,
     require: true,
   },
+  rol: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user"
+  },
 });
 
 const UserModel = moongoose.model("user", userSchema);

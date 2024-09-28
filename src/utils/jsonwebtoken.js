@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const private_key = "palabrasecretaparatoken";
+const private_key = "holamundo";
 
 const generateToken = (user) => {
   const token = jwt.sign(user, private_key, { expiresIn: "24h" });

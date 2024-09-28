@@ -14,9 +14,9 @@ const cookieParser = require("cookie-parser");
 require("./database.js");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-const passport = require("passport")
-const initializePassport = require("./config/passport.config.js")
-
+const passport = require("passport");
+const initializePassport = require("./config/passport.config.js");
+const jwt = require("jsonwebtoken")
 
 //middleware
 app.use(express.json());
@@ -39,9 +39,12 @@ app.set("views", "./src/views");
 const httpServer = app.listen(PUERTO, () => {
   console.log(`Escuchando en el http://localhost:${PUERTO}`);
 });
-
+//coockie
 const claveSecreta = "holamundo";
 app.use(cookieParser(claveSecreta));
+
+
+
 
 //session
 app.use(
@@ -55,11 +58,13 @@ app.use(
         "mongodb+srv://juan-mosqueda:coderjuan@cluster0.yzyo4.mongodb.net/storage?retryWrites=true&w=majority&appName=Cluster0",
       ttl: 100,
     }),
-  }));
+  })
+);
 
-  initializePassport()
-  app.use(passport.initialize())
-  app.use(passport.session())
+
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 //rutas
 app.use("/api/products/", productsRouter);
