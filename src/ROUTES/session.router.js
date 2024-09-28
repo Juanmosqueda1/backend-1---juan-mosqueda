@@ -23,7 +23,7 @@ router.post("/register", async (req, res) => {
       email,
       password: createHash(password),
       age,
-      rol
+      rol,
     });
 
     await nuevoUsuario.save();
@@ -49,12 +49,15 @@ router.post("/register", async (req, res) => {
 
 //login con jwt
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const email = req.body.email ? req.body.email.trim() : null;
+  const password = req.body.password ? req.body.password.trim() : null;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email y contraseña son requeridos" });
+  }
 
   try {
-    // Normalizar el email
-    const emailLimpio = email.trim().toLowerCase();
-    const usuario = await UserModel.findOne({ email: emailLimpio });
+    const usuario = await UserModel.findOne({ email });
 
     if (!usuario) {
       return res.send("usuario no encontrado");
@@ -76,10 +79,12 @@ router.post("/login", async (req, res) => {
       first_name: usuario.first_name,
       last_name: usuario.last_name,
       email: usuario.email,
-      age: usuario.age
-    }
+      age: usuario.age,
+    };
 
-    req.session.login = true
+    req.session.login = true;
+
+    console.log("Sesión después de login:", req.session);
 
     // Configurar la cookie con el token
     res.cookie("cookieToken", token, {
@@ -89,12 +94,14 @@ router.post("/login", async (req, res) => {
 
     // Redirigir al usuario a /products
     return res.redirect("/products");
-
   } catch (error) {
     // Manejo de errores
-    return res.status(500).send(error);
+    console.error("Error en el login:", error); // Log del error para debug
+    return res.status(500).json({ error: "error interno del servidor" });
   }
 });
+
+
 
 router.get("/logout", (req, res) => {
   if (req.session.login) {

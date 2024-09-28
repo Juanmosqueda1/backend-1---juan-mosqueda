@@ -6,14 +6,14 @@ const ProductosModel = require("../dao/models/productos.models.js");
 
 router.get("/login", (req, res) => {
   if (req.session.login) {
-    return res.redirect("/profile");
+    return res.redirect("/products");
   }
   res.render("login");
 });
 
 router.get("/register", (req, res) => {
   if (req.session.login) {
-    return res.redirect("/profile");
+    return res.redirect("/products");
   }
   res.render("register");
 });
@@ -25,11 +25,25 @@ router.get("/profile", (req, res) => {
   res.render("profile", { user: req.session.user });
 });
 
-router.get("/products", async (req, res) => {
+
+function isAuthenticated(req, res, next) {
+  if (req.session.login) {
+    // Si está autenticado, sigue con la petición
+    return next();
+  }
+  // Si no está autenticado, redirige al login
+  return res.redirect("/login");
+}
+
+router.get("/products", isAuthenticated,  async (req, res) => {
+
+  if (!req.session.login) {
+    return res.redirect("/login");
+  }
+
   let page = req.query.page || 1;
   let limit = 4;
   let sort = req.query.sort || "asc";
-
   let sortOption = sort === "desc" ? -1 : 1;
 
   try {
@@ -51,6 +65,7 @@ router.get("/products", async (req, res) => {
     // Combinar los objetos para pasarlos a la vista
     res.render("home", {
       products: listadoProductosFinal,
+      user: req.session.user,
       hasPrevPage: listadoProductos.hasPrevPage,
       hasNextPage: listadoProductos.hasNextPage,
       prevPage: listadoProductos.prevPage,
