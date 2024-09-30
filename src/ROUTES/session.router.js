@@ -5,6 +5,7 @@ const { createHash, isValidPassword } = require("../utils/utils.js");
 const passport = require("passport");
 const generateToken = require("../utils/jsonwebtoken.js");
 const jwt = require("jsonwebtoken");
+const CartModel = require("../dao/models/cart.model.js");
 
 //register jws
 
@@ -16,11 +17,17 @@ router.post("/register", async (req, res) => {
     if (existeUsuario) {
       return res.status(400).send("el usuario ya esta registrado");
     }
+
+    //creo un carrito
+    const nuevoCarrito = new CartModel();
+    await nuevoCarrito.save();
+
     //si no existe creamos uno nuevo
     const nuevoUsuario = await UserModel.create({
       first_name,
       last_name,
       email,
+      cart: nuevoCarrito._id,
       password: createHash(password),
       age,
       rol,
@@ -110,7 +117,6 @@ router.get("/logout", (req, res) => {
   res.clearCookie("cookieToken");
   res.redirect("/login");
 });
-
 
 //version para github
 

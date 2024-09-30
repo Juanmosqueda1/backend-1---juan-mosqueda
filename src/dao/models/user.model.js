@@ -28,6 +28,10 @@ const userSchema = new moongoose.Schema({
     enum: ["admin", "user"],
     default: "user"
   },
+  cart: {
+    type: moongoose.Schema.Types.ObjectId,
+    ref: "cart"
+  }
 });
 
 const UserModel = moongoose.model("user", userSchema);
