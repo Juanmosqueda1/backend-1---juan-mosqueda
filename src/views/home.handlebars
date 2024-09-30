@@ -2,11 +2,11 @@
 
 <p>Bienvenido! {{user.first_name}} {{user.last_name}} </p>
 <p>email : {{user.email}}</p>
-<p>edad: {{ user.age }}</p>
+<p>edad: {{user.age}}</p>
 
 <!-- Enlaces para ordenar los productos -->
-<a href="/products?page={{currentPage}}&sort=asc">Ordenar por precio ascendente</a>
-<a href="/products?page={{currentPage}}&sort=desc">Ordenar por precio descendente</a>
+<a href="/current?page={{currentPage}}&sort=asc">Ordenar por precio ascendente</a>
+<a href="/current?page={{currentPage}}&sort=desc">Ordenar por precio descendente</a>
 
 {{#each products}}
   <div class="card">
@@ -17,12 +17,12 @@
   </div>
 {{/each}}
 {{#if hasPrevPage}}
-  <a href="/products?page={{prevPage}}"> Anterior</a>
+  <a href="/current?page={{prevPage}}"> Anterior</a>
 {{/if}}
 
 {{#if hasNextPage}}
-  <a href="/products?page={{nextPage}}"> siguiente</a>
+  <a href="/current?page={{nextPage}}"> siguiente</a>
 {{/if}}
 
-<p>{{currentPage}} de {{totalPages}}</p> <a href="api/sessions/logout"> Logout </a>
-
+<p>{{currentPage}} de {{totalPages}}</p>
+<a href="api/sessions/logout"> Logout </a>

@@ -40,7 +40,7 @@ router.post("/register", async (req, res) => {
       httpOnly: true,
     });
 
-    res.redirect("/products");
+    res.redirect("/current");
   } catch (error) {
     console.error(error);
     res.status(500).send("error fatal");
@@ -73,6 +73,7 @@ router.post("/login", async (req, res) => {
       first_name: usuario.first_name,
       last_name: usuario.last_name,
       email: usuario.email,
+      rol: usuario.rol,
     });
 
     req.session.user = {
@@ -80,6 +81,7 @@ router.post("/login", async (req, res) => {
       last_name: usuario.last_name,
       email: usuario.email,
       age: usuario.age,
+      rol: usuario.rol,
     };
 
     req.session.login = true;
@@ -93,7 +95,7 @@ router.post("/login", async (req, res) => {
     });
 
     // Redirigir al usuario a /products
-    return res.redirect("/products");
+    return res.redirect("/current");
   } catch (error) {
     // Manejo de errores
     console.error("Error en el login:", error); // Log del error para debug
@@ -101,14 +103,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-
 router.get("/logout", (req, res) => {
   if (req.session.login) {
     req.session.destroy();
   }
+  res.clearCookie("cookieToken");
   res.redirect("/login");
 });
+
 
 //version para github
 
@@ -124,7 +126,7 @@ router.get(
   async (req, res) => {
     req.session.user = req.user;
     req.session.login = true;
-    res.redirect("/profile");
+    res.redirect("/current");
   }
 );
 
